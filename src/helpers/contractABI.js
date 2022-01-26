@@ -466,7 +466,7 @@ export const MagePadNFTABI = [
   }
 ];
 
-export const MagePadNFTAddress = "0x68C493543E3eE338C578d1dc48371051Ebf8F04d".toLowerCase();
+export const MagePadNFTAddress = "0x0b510918b07227048594B9416253c1601f9ECb2d".toLowerCase();
 
 export const MarketplaceABI = [
   {
@@ -793,7 +793,7 @@ export const MarketplaceABI = [
   }
 ];
 
-export const MarketplaceAddress = "0x9Bb93dF212f4c98EFCBe3715dBfcc8D03384d9EF";
+export const MarketplaceAddress = "0x53b8A0c41b41D5FF5906Fc16f8784713a6E14638";
 
 export const IERC20ABI = [
   {
@@ -1275,4 +1275,4 @@ export const MagePadABI = [
   }
 ];
 
-export const MagePadAddress = "0x60eddf90CE9c5aCaed5164cE4f42bcC28805CEc5";
+export const MagePadAddress = "0xafbface2B7a4e29DFa768c21d0c5f28A0bd9927d";

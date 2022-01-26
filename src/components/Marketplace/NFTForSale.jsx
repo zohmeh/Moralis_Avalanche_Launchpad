@@ -14,14 +14,13 @@ Moralis.start({
 
 function NFTForSale({ nft, index }) {
   const tokenId = nft.attributes.tokenId;
-  const { Moralis, user } = useMoralis();
+  const { Moralis, account } = useMoralis();
   const [stakingReward, setStakingReward] = useState();
   const [amount, setAmount] = useState(0);
   const [showDiagramm, setShowDiagramm] = useState(false);
   const [isStateLoading, setIsStateLoading] = useState(false);
   const [nftInfo, setNFTInfo] = useState();
-  const _walletAddress = user ? user.attributes.ethAddress : null;
-  const { data, error, isLoading } = useMoralisCloudFunction(
+  const { data } = useMoralisCloudFunction(
     "getPricehistory",
     { MagePadNFTAddress, tokenId },
     [],
@@ -56,7 +55,7 @@ function NFTForSale({ nft, index }) {
   
   useEffect(() => {
     const interval = setInterval(() => {
-        nftInfo != undefined && parseInt(nftInfo.lockedAmount) > 0 && setStakingReward(stakingReward => stakingReward + parseInt(nftInfo.interest) / 10);
+        nftInfo !== undefined && parseInt(nftInfo.lockedAmount) > 0 && setStakingReward(stakingReward => stakingReward + parseInt(nftInfo.interest) / 10);
     }, 100);
         return () => clearInterval(interval);
   }, [isStateLoading, nftInfo]);
@@ -71,7 +70,7 @@ function NFTForSale({ nft, index }) {
     const params = {
           tokenId: tokenId,
           price: web3.utils.toWei(amount.toString(), "ether").toString(),
-          walletAddress: _walletAddress,
+          walletAddress: account,
           MagePadNFTAddress: MagePadNFTAddress,
           MarketplaceAddress: MarketplaceAddress,
       }
@@ -82,7 +81,7 @@ function NFTForSale({ nft, index }) {
 
       newOffer.set("tokenId", tokenId);
       newOffer.set("magePadNFTAddress", MagePadNFTAddress);
-      newOffer.set("highestBidder", _walletAddress);
+      newOffer.set("highestBidder", account);
       newOffer.set("highestBid", web3.utils.toWei(amount.toString(), "ether").toString());
 
       await newOffer.save();

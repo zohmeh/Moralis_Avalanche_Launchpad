@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useMoralis, useMoralisCloudFunction, useMoralisQuery } from "react-moralis";
+import { useMoralis } from "react-moralis";
 import { Skeleton, Table, Image, Button, Spin } from "antd";
 import { tokenValue } from "../../helpers/formatters";
 import { MagePadNFTABI, MagePadNFTAddress, MagePadABI, MagePadAddress } from "../../helpers/contractABI";
@@ -10,16 +10,12 @@ function LaunchpadBalance() {
   const [isMinting, setIsMinting] = useState(false);
   const [itemId, setItemId] = useState("");
   const { Moralis, account } = useMoralis();
-  let walletAddress;
-  if(account) {
-    walletAddress = account;
-  }
  
   const fetchMyInvestments = async () => {
     const params = {
        MagePadABI: MagePadABI,
        MagePadAddress: MagePadAddress,
-       walletAddress: walletAddress,
+       walletAddress: account,
      }
      const investments = await Moralis.Cloud.run("getMyInvestments", params);
      setMyInvestments(investments);
@@ -46,7 +42,7 @@ function LaunchpadBalance() {
     const tokenId = tx.events.Transfer.returnValues.tokenId;
 
     const query = new Moralis.Query("NewInvestments");
-    query.equalTo("investorAddress", walletAddress);
+    query.equalTo("investorAddress", account);
     query.equalTo("tokenAddress", item.tokenAddress);
     let result = await query.first();
     if(result) {
@@ -100,7 +96,7 @@ function LaunchpadBalance() {
         key: "minting",
         width: "25%",
         render: (value, item) => { 
-          if(item.id == itemId) {
+          if(item.id === itemId) {
             return (!item.nftminted && (
               isMinting ? <Spin /> : <Button
                 onClick={() => {mint(item)}}

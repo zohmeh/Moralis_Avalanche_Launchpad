@@ -9,14 +9,14 @@ import {
 import Account from "components/Account";
 import Chains from "components/Chains";
 import NFTBalance from "components/NFTBalances/NFTBalances";
-import { Layout, Tabs } from "antd";
+import { Layout } from "antd";
 import "antd/dist/antd.css";
 import "./style.css";
 import MenuItems from "./components/MenuItems";
 import Launchpad from "./components/Launchpad/Launchpad";
 import Marketplace from "components/Marketplace/Marketplace";
 import Balances from "components/TokenBalance/Balances";
-const { Header, Footer } = Layout;
+const { Header } = Layout;
 
 const styles = {
   content: {

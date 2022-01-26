@@ -7,7 +7,7 @@ import Project from "./Project";
 
 const Launchpad = function () {
   const [isCreateNewProjectModalActive, setCreateNewProjectModalActive] = useState(false);
-  const { data, error, isLoading } = useMoralisQuery(
+  const { data } = useMoralisQuery(
     "Launchprojects",
     query => query.descending("created"),
     [],

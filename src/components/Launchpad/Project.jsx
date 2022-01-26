@@ -12,8 +12,7 @@ Moralis.start({
 });
 
 function Project({ project, index }) {
-  const { Moralis, user } = useMoralis();
-  const walletAddress = user ? user.attributes.ethAddress : null;
+  const { Moralis, account } = useMoralis();
   const [tokenAmount, setTokenAmount] = useState();
   const [availableTokenToInvest, setAvailableTokenToInvest] = useState("");
   const [percentage, setPercentage] = useState("");
@@ -34,7 +33,7 @@ function Project({ project, index }) {
   }
 
   let config;
-  if(percentage != "") {
+  if(percentage !== "") {
     config = {
       percent: percentage,
       shape: 'circle',
@@ -72,7 +71,7 @@ function Project({ project, index }) {
     const Investment = Moralis.Object.extend("NewInvestments");
     const investment = new Investment();
 
-    investment.set("investorAddress", walletAddress);
+    investment.set("investorAddress", account);
     investment.set("tokenAddress", project.attributes.tokenAddress);
     investment.set("investmentCreation", Date.now());
 
@@ -129,7 +128,7 @@ function Project({ project, index }) {
         <div style={{display: "flex", flexDirection:"column", color: "orange"}}>
             <p>Token: {project.attributes.tokenName}</p>
             <div style={{display: "flex", flexDirection: "row", justifyContent:"space-between", width: "570px"}}>
-            <p>Available Token amount: {availableTokenToInvest != "" && availableTokenToInvest + " / " + project.attributes.tokenAmount}</p>
+            <p>Available Token amount: {availableTokenToInvest !== "" && availableTokenToInvest + " / " + project.attributes.tokenAmount}</p>
             <div style={{height: "150px", position: "relative", zIndex: "0"}}><Liquid {...config} /></div>
             </div>
             <p>Launchending: {DateConverted(project.attributes.projectCreation + (parseFloat(project.attributes.launchduration) * 24 * 60 * 60 * 1000))}</p>

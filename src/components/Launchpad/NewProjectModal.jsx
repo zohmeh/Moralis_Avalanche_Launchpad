@@ -35,7 +35,7 @@ const NewProjectModal = ({ open, onClose }) => {
 
   const { Moralis, account } = useMoralis();
   const {  saveFile } = useMoralisFile(); // To save file in IPFS
-  const { data, error } = useMoralisCloudFunction(
+  const { data } = useMoralisCloudFunction(
     "getTokenBalances",
     { account },
     [],

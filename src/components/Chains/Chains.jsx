@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { Menu, Dropdown, Button } from "antd";
-import { DownOutlined } from "@ant-design/icons";
-import { AvaxLogo, PolygonLogo, BSCLogo, ETHLogo } from "./Logos";
+import { Button } from "antd";
+import { AvaxLogo } from "./Logos";
 import { useChain } from "react-moralis";
 
 const styles = {
@@ -36,10 +35,8 @@ const menuItems = [
 ];
 
 function Chains() {
-  const { switchNetwork, chainId, chain } = useChain();
+  const { switchNetwork, chainId } = useChain();
   const [selected, setSelected] = useState({});
-
-  console.log("chain", chain)
 
   useEffect(() => {
     if (!chainId) return null;
@@ -52,16 +49,6 @@ function Chains() {
     console.log("switch to: ", e.key);
     switchNetwork(e.key);
   };
-
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      {menuItems.map((item) => (
-        <Menu.Item key={item.key} icon={item.icon} style={styles.item}>
-          <span style={{ marginLeft: "5px" }}>{item.value}</span>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
 
   return (
     <div>

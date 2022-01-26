@@ -11,8 +11,8 @@ Moralis.start({
 });
 
 function MyOffers() {
-  const { Moralis, account } = useMoralis();
-  const { data, error, isLoading } = useMoralisCloudFunction(
+  const { account } = useMoralis();
+  const { data } = useMoralisCloudFunction(
     "getMyOffers",
     { MagePadNFTAddress, account, MarketplaceAddress },
     [],

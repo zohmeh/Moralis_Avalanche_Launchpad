@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useMoralis, useMoralisCloudFunction } from "react-moralis";
-import { Modal, Input, Skeleton } from "antd";
-import AddressInput from "../AddressInput";
+import { Skeleton } from "antd";
 import { Moralis } from "moralis";
 import { MagePadNFTAddress, MarketplaceAddress, MagePadABI, MagePadAddress } from "../../helpers/contractABI";
 import NFTBalance from "./NFTBalance";
@@ -27,8 +26,8 @@ const styles = {
 };
 
 function NFTBalances() {
-  const { Moralis, account } = useMoralis();
-  const { data, error, isLoading } = useMoralisCloudFunction(
+  const { account } = useMoralis();
+  const { data } = useMoralisCloudFunction(
     "getMyMageNFTs",
     { MagePadNFTAddress, account, MarketplaceAddress, MagePadABI, MagePadAddress },
     [],

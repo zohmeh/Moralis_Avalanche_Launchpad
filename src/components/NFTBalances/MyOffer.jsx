@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useMoralis } from "react-moralis";
-import { Card, Image, Button } from "antd";
+import { Card, Button } from "antd";
 import { Moralis } from "moralis";
-import { MagePadNFTAddress, MagePadNFTABI, MarketplaceAddress, MarketplaceABI } from "../../helpers/contractABI";
-import { getEllipsisTxt, tokenValue } from "../../helpers/formatters";
-import moneyFlow from "../../images/moneyFlow.jpg";
+import { MagePadNFTAddress, MarketplaceAddress, MarketplaceABI } from "../../helpers/contractABI";
+import { tokenValue } from "../../helpers/formatters";
 
 Moralis.start({
   serverUrl: process.env.REACT_APP_MORALIS_SERVER_URL,
@@ -12,7 +11,7 @@ Moralis.start({
 });
 
 function MyOffer({ nft, index }) {
-  const { Moralis, user } = useMoralis();
+  const { Moralis } = useMoralis();
   
   const buyNFT = async () => {
     const options = {
@@ -59,8 +58,8 @@ function MyOffer({ nft, index }) {
         color: "white",
       }}
     >
-      <h3 style={{ color: "orange" }}>{"Hourglass NFT " + " " + nft.tokenId} </h3>
-      <p>MyBid: {tokenValue(nft.myBid, 18) + " AVAX"} </p>
+      <h3 style={{ color: "orange" }}>{"Hourglass NFT " + " " + nft.tokenId.toString()} </h3>
+      <p>MyBid: {tokenValue(nft.myBid, 18).toString() + " AVAX"} </p>
       <p>Accepted by seller: {nft.isAccepted.toString()}</p>
       {nft.isAccepted && <div style={{display: "flex", justifyContent: "center"}}>
         < Button onClick={buyNFT} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Buy NFT</Button>

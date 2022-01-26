@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useMoralis, useMoralisCloudFunction } from "react-moralis";
-import { Card, Image, Button, Spin } from "antd";
+import { Card, Button, Spin } from "antd";
 import { Moralis } from "moralis";
 import { MagePadNFTAddress, MagePadNFTABI, MarketplaceAddress, MagePadAddress, MagePadABI, MarketplaceABI} from "../../helpers/contractABI";
 import { getEllipsisTxt, tokenValue } from "../../helpers/formatters";
@@ -22,7 +22,7 @@ function NFTBalance({ nft, index }) {
   const [showDiagramm, setShowDiagramm] = useState(false);
   const [isStateLoading, setIsStateLoading] = useState(false);
   const [nftInfo, setNFTInfo] = useState();
-  const { data, error, isLoading } = useMoralisCloudFunction(
+  const { data } = useMoralisCloudFunction(
     "getPricehistory",
     { MagePadNFTAddress, tokenId },
     [],
@@ -46,7 +46,7 @@ function NFTBalance({ nft, index }) {
  
   useEffect(() => {
     const interval = setInterval(() => {
-        nftInfo != undefined && parseInt(nftInfo.lockedAmount) > 0 && setStakingReward(stakingReward => stakingReward + parseInt(nftInfo.interest) / 10);
+        nftInfo !== undefined && parseInt(nftInfo.lockedAmount) > 0 && setStakingReward(stakingReward => stakingReward + parseInt(nftInfo.interest) / 10);
     }, 100);
         return () => clearInterval(interval);
   }, [isStateLoading, nftInfo]);

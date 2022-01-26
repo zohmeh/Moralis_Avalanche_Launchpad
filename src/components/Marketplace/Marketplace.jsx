@@ -19,7 +19,7 @@ const styles = {
 };
 
 function Marketplace() {
-  const { data, error, isLoading } = useMoralisCloudFunction(
+  const { data } = useMoralisCloudFunction(
     "getNFTForSale",
     { MagePadNFTAddress, MarketplaceAddress },
     [],

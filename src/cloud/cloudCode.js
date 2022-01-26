@@ -182,8 +182,8 @@ Moralis.Cloud.define("placeOffer", async (request) => {
 });
 
 Moralis.Cloud.job("checkMarketplace", async (request) => {
-  const MarketplaceAddress = "0x9Bb93dF212f4c98EFCBe3715dBfcc8D03384d9EF";
-  const MagePadNFTAddress = "0x7406E0b62afA2C3184f42C71337cEF7fcDCD9506";
+  const MarketplaceAddress = "0x53b8A0c41b41D5FF5906Fc16f8784713a6E14638";
+  const MagePadNFTAddress = "0x0b510918b07227048594B9416253c1601f9ECb2d";
 
   const web3 = Moralis.web3ByChain("0xa869");
   const contractMarketplace = new web3.eth.Contract(MarketplaceABI, MarketplaceAddress);
