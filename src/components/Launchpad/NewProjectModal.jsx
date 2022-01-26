@@ -44,6 +44,7 @@ const NewProjectModal = ({ open, onClose }) => {
 
   const create = async function () {
     setIsLoading(true);
+    const web3 = await Moralis.enableWeb3();
     let _projectTokenAmount = (2*(projectTokenAmount * 10**projectTokenDecimals)).toString();
     const _projectLaunchDuration = projectLaunchDuration * 24 * 60 * 60;  
         //allow the magepad contract to handle my supertoken token
@@ -67,7 +68,7 @@ const NewProjectModal = ({ open, onClose }) => {
             _tokenAddress: projectTokenAddress,
             _amount: _projectTokenAmount,
             _projectDuration: _projectLaunchDuration,
-            _conversionRate: projectTokenConversionRate,
+            _conversionRate: web3.utils.toWei(projectTokenConversionRate.toString(), "ether"),
             _lockedPercentage: (lockedPercentage * 100),
         },
     };

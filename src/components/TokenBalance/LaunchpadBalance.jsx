@@ -12,13 +12,38 @@ function LaunchpadBalance() {
   const { Moralis, account } = useMoralis();
  
   const fetchMyInvestments = async () => {
+    const web3 = await Moralis.enableWeb3();
     const params = {
        MagePadABI: MagePadABI,
        MagePadAddress: MagePadAddress,
        walletAddress: account,
      }
      const investments = await Moralis.Cloud.run("getMyInvestments", params);
+     for(let i = 0; i < investments.length; i++) {
+       if(investments[i].nftminted) {
+        const contract =  new web3.eth.Contract(MagePadNFTABI, MagePadNFTAddress);
+        const nftInfo = await contract.methods.allNFTs(parseInt(investments[i].nftId)).call();
+        const lockedTokens = nftInfo.tokenAmount;
+        investments[i].lockedTokens = lockedTokens;
+       }
+     }
+     console.log(investments);
      setMyInvestments(investments);
+  };
+
+  async function withdraw(item) {
+    setIsMinting(true);
+    const optionsWithdraw = {
+      contractAddress: MagePadNFTAddress,
+      functionName: "withdrawStakedAmount",
+      abi: MagePadNFTABI,
+      params: {
+        _tokenId: item.nftId,
+        _magePadAddress: MagePadAddress
+      }
+    };
+    await Moralis.executeFunction(optionsWithdraw);
+    setIsMinting(false);
   }
 
   useEffect(() => {
@@ -62,7 +87,7 @@ function LaunchpadBalance() {
       title: "Project",
       dataIndex: "project",
       key: "image",
-      width: "25%",
+      width: 5,
       render: (item) => (<Image
         width={50}
         height={50}
@@ -73,28 +98,45 @@ function LaunchpadBalance() {
         title: "Project name",
         dataIndex: "project",
         key: "name",
-        width: "25%",
+        width: 10,
         render: (item) => item.attributes.name, //data.attributes.project.attributes.name,
       },
       {
       title: "Token name",
       dataIndex: "project",
       key: "tokenname",
-      width: "25%",
+      width: 15,
       render: (item) => item.attributes.tokenName,
+    },
+    {
+      title: "Unlocked tokens",
+      dataIndex: "lockedTokens",
+      key: "balance",
+      width: 15,
+      render: (value, item) => {
+        const unlockedTokens = value * (1 / parseFloat(item.project.attributes.lockedpercentage) - 1);
+        return tokenValue(unlockedTokens, parseInt(item.project.attributes.tokenDecimals)).toFixed(6);
+      },
     },
     {
       title: "Locked tokens",
       dataIndex: "lockedTokens",
       key: "balance",
-      width: "25%",
-      render: (value, item) => (!item.nftminted ? tokenValue(value, 18).toFixed(6) : "Hourglass NFT " + item.nftId + " was minted"),
+      width: 50,
+      render: (value, item) => {
+        if(item.nftminted) {
+          return ("Hourglass NFT " + item.nftId + " was minted with " + tokenValue(parseInt(item.lockedTokens), parseInt(item.project.attributes.tokenDecimals)).toFixed(6) + " Tokens locked")
+        }
+        else {
+          return (tokenValue(value, parseInt(item.project.attributes.tokenDecimals)).toFixed(6));
+        }
+      }
     },
     {
         title: "Mint NFT",
         dataIndex: "lockedTokens",
         key: "minting",
-        width: "25%",
+        width: 15,
         render: (value, item) => { 
           if(item.id === itemId) {
             return (!item.nftminted && (
@@ -110,7 +152,7 @@ function LaunchpadBalance() {
                 Mint
             </Button>))
           } else {
-            return (!item.nftminted && <Button
+            return (!item.nftminted ? <Button
                 onClick={() => {mint(item)}}
                 style={{
                 color: "orange",
@@ -120,6 +162,16 @@ function LaunchpadBalance() {
                 }}
             >
                 Mint
+            </Button> : <Button
+                onClick={() => {withdraw(item)}}
+                style={{
+                color: "orange",
+                backgroundColor: "blue",
+                borderRadius: "15px",
+                border: "0px",
+                }}
+            >
+                Unlock tokens
             </Button>)
           }
         },

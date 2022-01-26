@@ -24,7 +24,8 @@ function MyOffer({ nft, index }) {
           magePadNFTAddress: MagePadNFTAddress
         }
       };
-      await Moralis.executeFunction(options);
+      const tx = await Moralis.executeFunction(options);
+      console.log(tx);
 
       //store the price in pricehistory
       const storeParams = {

@@ -43,7 +43,7 @@ function NFTBalance({ nft, index }) {
     setNFTInfo(info);
     parseInt(info.lockedAmount) > 0 ? setStakingReward(((Date.now() / 1000) - parseInt(info.mintingTime)) * parseInt(info.interest)) : setStakingReward(0);
   }
- 
+
   useEffect(() => {
     const interval = setInterval(() => {
         nftInfo !== undefined && parseInt(nftInfo.lockedAmount) > 0 && setStakingReward(stakingReward => stakingReward + parseInt(nftInfo.interest) / 10);
@@ -188,10 +188,7 @@ function NFTBalance({ nft, index }) {
           < Button onClick={removeOffer} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Remove Offer</Button>
           < Button onClick={acceptOffer} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Accept Offer</Button>
         </div> 
-          :
-          <div style={{display: "flex", justifyContent: "center"}}>
-          < Button onClick={removeOffer} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Remove Offer</Button>
-          </div>
+          : null
       )
       }
       
