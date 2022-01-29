@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useMoralis } from "react-moralis";
-import { Card, Button } from "antd";
+import { Card, Button, Spin } from "antd";
 import { Moralis } from "moralis";
-import { MagePadNFTAddress, MarketplaceAddress, MarketplaceABI } from "../../helpers/contractABI";
+import {
+  MagePadNFTAddress,
+  MarketplaceAddress,
+  MarketplaceABI,
+} from "../../helpers/contractABI";
 import { tokenValue } from "../../helpers/formatters";
 
 Moralis.start({
@@ -12,38 +16,43 @@ Moralis.start({
 
 function MyOffer({ nft, index }) {
   const { Moralis } = useMoralis();
-  
+  const [isloading, setIsLoading] = useState(false);
+
   const buyNFT = async () => {
+    setIsLoading(true);
     const options = {
-        contractAddress: MarketplaceAddress,
-        functionName: "buyNFT",
-        abi: MarketplaceABI,
-        msgValue: nft.myBid,
-        params: {
-          tokenId: nft.tokenId,
-          magePadNFTAddress: MagePadNFTAddress
-        }
-      };
-      const tx = await Moralis.executeFunction(options);
-      console.log(tx);
-
-      //store the price in pricehistory
-      const storeParams = {
+      contractAddress: MarketplaceAddress,
+      functionName: "buyNFT",
+      abi: MarketplaceABI,
+      msgValue: nft.myBid,
+      params: {
         tokenId: nft.tokenId,
-        price: nft.myBid,
-        date: Date.now(),
-        MagePadNFTAddress: MagePadNFTAddress,
-      }
-      
-      await Moralis.Cloud.run("storePricehistory", storeParams);
+        magePadNFTAddress: MagePadNFTAddress,
+      },
+    };
+    const tx = await Moralis.executeFunction(options);
+    console.log(tx.events.SoldNFT.returnValues._from);
+    const sellerAddress = tx.events.SoldNFT.returnValues._from;
 
-      //clear database after buy event
-      const params = {
-        tokenId: nft.tokenId,
-        MagePadNFTAddress: MagePadNFTAddress,
-        }
-        await Moralis.Cloud.run("clearAfterBuy", params);
-  }
+    //store the price in pricehistory
+    const storeParams = {
+      tokenId: nft.tokenId,
+      price: nft.myBid,
+      date: Date.now(),
+      MagePadNFTAddress: MagePadNFTAddress,
+    };
+
+    await Moralis.Cloud.run("storePricehistory", storeParams);
+
+    //clear database after buy event
+    const params = {
+      tokenId: nft.tokenId,
+      MagePadNFTAddress: MagePadNFTAddress,
+      seller: sellerAddress,
+    };
+    await Moralis.Cloud.run("clearAfterBuy", params);
+    setIsLoading(false);
+  };
 
   return (
     <Card
@@ -59,14 +68,32 @@ function MyOffer({ nft, index }) {
         color: "white",
       }}
     >
-      <h3 style={{ color: "orange" }}>{"Hourglass NFT " + " " + nft.tokenId.toString()} </h3>
+      <h3 style={{ color: "orange" }}>
+        {"Hourglass NFT " + " " + nft.tokenId.toString()}{" "}
+      </h3>
       <p>MyBid: {tokenValue(nft.myBid, 18).toString() + " AVAX"} </p>
       <p>Accepted by seller: {nft.isAccepted.toString()}</p>
-      {nft.isAccepted && <div style={{display: "flex", justifyContent: "center"}}>
-        < Button onClick={buyNFT} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Buy NFT</Button>
-      </div>}
+      {nft.isAccepted && (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {isloading ? (
+            <Spin />
+          ) : (
+            <Button
+              onClick={buyNFT}
+              style={{
+                color: "orange",
+                backgroundColor: "blue",
+                borderRadius: "15px",
+                border: "0px",
+              }}
+            >
+              Buy NFT
+            </Button>
+          )}
+        </div>
+      )}
     </Card>
-  )  
+  );
 }
 
 export default MyOffer;

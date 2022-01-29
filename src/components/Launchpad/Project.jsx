@@ -20,23 +20,32 @@ function Project({ project, index }) {
   const [isInvesting, setIsInvesting] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const [tokenUnlocked, setTokenUnlocked] = useState(false);
+  const [launchending, setLaunchending] = useState(
+    Date.now() >=
+      project.attributes.launchduration * 60 * 60 * 1000 +
+        project.attributes.projectCreation
+  );
 
   const fetchProjectTokenBalance = async function () {
     const web3 = await Moralis.enableWeb3();
     const contract = new web3.eth.Contract(MagePadABI, MagePadAddress);
-    const projectTokenBalance = await contract.methods.projects(project.attributes.tokenAddress).call();
-    const availableToken = parseInt(projectTokenBalance.launchingTokenBalance) / 10**(parseInt(project.attributes.tokenDecimals));
+    const projectTokenBalance = await contract.methods
+      .projects(project.attributes.tokenAddress)
+      .call();
+    const availableToken =
+      parseInt(projectTokenBalance.launchingTokenBalance) /
+      10 ** parseInt(project.attributes.tokenDecimals);
     const _percentage = availableToken / project.attributes.tokenAmount;
     setAvailableTokenToInvest(availableToken.toFixed(6));
     setPercentage(_percentage);
     setTokenUnlocked(projectTokenBalance.allowUnlocking);
-  }
+  };
 
   let config;
-  if(percentage !== "") {
+  if (percentage !== "") {
     config = {
       percent: percentage,
-      shape: 'circle',
+      shape: "circle",
       outline: {
         border: 2,
         distance: 4,
@@ -49,21 +58,28 @@ function Project({ project, index }) {
 
   useEffect(() => {
     fetchProjectTokenBalance();
-  },[transaction])
-  
+  }, [transaction]);
+
   const invest = async function () {
     setIsInvesting(true);
     const web3 = new Moralis.Web3();
-    const sendingAVAX = parseFloat(tokenAmount) * 10**parseFloat(project.attributes.tokenDecimals) / (project.attributes.conversionRate * 10**parseFloat(project.attributes.tokenDecimals));
+    const sendingAVAX =
+      (parseFloat(tokenAmount) *
+        10 ** parseFloat(project.attributes.tokenDecimals)) /
+      (project.attributes.conversionRate *
+        10 ** parseFloat(project.attributes.tokenDecimals));
 
     const optionsInvest = {
       contractAddress: MagePadAddress,
       functionName: "invest",
       abi: MagePadABI,
-      msgValue: web3.utils.toWei(sendingAVAX.toString(), "ether"), 
+      msgValue: web3.utils.toWei(sendingAVAX.toString(), "ether"),
       params: {
         _tokenAddress: project.attributes.tokenAddress,
-        _amount: (parseFloat(tokenAmount) * 10**parseFloat(project.attributes.tokenDecimals)).toString(),
+        _amount: (
+          parseFloat(tokenAmount) *
+          10 ** parseFloat(project.attributes.tokenDecimals)
+        ).toString(),
       },
     };
     const tx = await Moralis.executeFunction(optionsInvest);
@@ -78,11 +94,11 @@ function Project({ project, index }) {
     await investment.save();
     setIsInvesting(false);
     setTransaction(tx);
-  }
+  };
 
   const unlockTokens = async function () {
     setIsUnlocking(true);
-    const web3 = new Moralis.Web3();   
+    const web3 = new Moralis.Web3();
     const optionsUnlock = {
       contractAddress: MagePadAddress,
       functionName: "unlockTokens",
@@ -95,10 +111,27 @@ function Project({ project, index }) {
 
     setTransaction(tx);
     setIsUnlocking(false);
-  }
+  };
+
+  const withdraw = async function () {
+    setIsUnlocking(true);
+    const web3 = new Moralis.Web3();
+    const optionsWithdraw = {
+      contractAddress: MagePadAddress,
+      functionName: "withdrawFunds",
+      abi: MagePadABI,
+      params: {
+        _tokenAddress: project.attributes.tokenAddress,
+      },
+    };
+    const tx = await Moralis.executeFunction(optionsWithdraw);
+
+    setTransaction(tx);
+    setIsUnlocking(false);
+  };
 
   return (
-      <Card
+    <Card
       hoverable
       bordered={false}
       style={{
@@ -110,57 +143,136 @@ function Project({ project, index }) {
         color: "white",
       }}
       cover={
-        <div style={{display: "flex", flexDirection:"row", justifyContent:"space-between"}}>
-            <div style={{display: "flex", flexDirection:"column", color: "orange"}}>
-                <h2 style={{color: "orange"}}>{project.attributes.name}</h2>
-                <p style={{color: "orange"}}>{"1 AVAX = " + project.attributes.conversionRate + " " + project.attributes.tokenSymbol}</p>
-                <p style={{color: "orange"}}>{project.attributes.description}</p>
-            </div>
-            <Image
-                width={100}
-                height={100}
-                style={{borderRadius: "50px"}}
-                src={project.attributes.image.ipfs()} />
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              color: "orange",
+            }}
+          >
+            <h2 style={{ color: "orange" }}>{project.attributes.name}</h2>
+            <p style={{ color: "orange" }}>
+              {"1 AVAX = " +
+                project.attributes.conversionRate +
+                " " +
+                project.attributes.tokenSymbol}
+            </p>
+            <p style={{ color: "orange" }}>{project.attributes.description}</p>
+          </div>
+          <Image
+            width={100}
+            height={100}
+            style={{ borderRadius: "50px" }}
+            src={project.attributes.image.ipfs()}
+          />
         </div>
       }
       //key={nft.id}
     >
-        <div style={{display: "flex", flexDirection:"column", color: "orange"}}>
-            <p>Token: {project.attributes.tokenName}</p>
-            <div style={{display: "flex", flexDirection: "row", justifyContent:"space-between", width: "570px"}}>
-            <p>Available Token amount: {availableTokenToInvest !== "" && availableTokenToInvest + " / " + project.attributes.tokenAmount}</p>
-            <div style={{height: "150px", position: "relative", zIndex: "0"}}><Liquid {...config} /></div>
+      <div
+        style={{ display: "flex", flexDirection: "column", color: "orange" }}
+      >
+        <p>Token: {project.attributes.tokenName}</p>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            width: "570px",
+          }}
+        >
+          <p>
+            Available Token amount:{" "}
+            {availableTokenToInvest !== "" &&
+              availableTokenToInvest + " / " + project.attributes.tokenAmount}
+          </p>
+          <div style={{ height: "150px", position: "relative", zIndex: "0" }}>
+            <Liquid {...config} />
+          </div>
+        </div>
+        <p>
+          Launchending:{" "}
+          {DateConverted(
+            project.attributes.projectCreation +
+              parseFloat(project.attributes.launchduration) *
+                24 *
+                60 *
+                60 *
+                1000
+          )}
+        </p>
+        <p>
+          Token percentage locked :{" "}
+          {(parseFloat(project.attributes.lockedpercentage) * 100).toString() +
+            " %"}{" "}
+        </p>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+          <p style={{ color: "orange" }}> Token amount you want to invest in</p>
+          <InputNumber
+            defaultValue={0}
+            onChange={(value) => setTokenAmount(value)}
+          />
+          {isInvesting ? (
+            <Spin />
+          ) : (
+            <Button
+              onClick={invest}
+              style={{
+                color: "orange",
+                backgroundColor: "blue",
+                borderRadius: "15px",
+                border: "0px",
+              }}
+            >
+              Invest
+            </Button>
+          )}
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: "20px" }}>
+          {isUnlocking ? (
+            <Spin />
+          ) : (
+            <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+              {!tokenUnlocked && project.attributes.projectCreator == account && launchending &&(
+                <Button
+                  onClick={unlockTokens}
+                  style={{
+                    color: "orange",
+                    backgroundColor: "blue",
+                    borderRadius: "15px",
+                    border: "0px",
+                  }}
+                >
+                  Unlock Tokens
+                </Button>
+              )}
+
+              {launchending && project.attributes.projectCreator == account && (
+                <Button
+                  onClick={withdraw}
+                  style={{
+                    color: "orange",
+                    backgroundColor: "blue",
+                    borderRadius: "15px",
+                    border: "0px",
+                  }}
+                >
+                  Withdraw tokens
+                </Button>
+              )}
             </div>
-            <p>Launchending: {DateConverted(project.attributes.projectCreation + (parseFloat(project.attributes.launchduration) * 24 * 60 * 60 * 1000))}</p>
-            <p>Token percentage locked : {(parseFloat(project.attributes.lockedpercentage) * 100).toString() + " %"} </p>
+          )}
         </div>
-        <div style={{display: "flex", justifyContent: "center", gap: "20px"}}>
-            <p style={{color: "orange"}}> Token amount you want to invest in</p>
-            <InputNumber defaultValue={0} onChange={(value) => setTokenAmount(value)} />
-            {isInvesting ? <Spin /> : <Button
-                onClick={invest}
-                style={{
-                color: "orange",
-                backgroundColor: "blue",
-                borderRadius: "15px",
-                border: "0px",
-                }}
-            >
-                Invest
-            </Button>}
-        </div>
-        {!tokenUnlocked && (isUnlocking ? <Spin /> : <Button
-                onClick={unlockTokens}
-                style={{
-                color: "orange",
-                backgroundColor: "blue",
-                borderRadius: "15px",
-                border: "0px",
-                }}
-            >
-                Unlock Tokens
-            </Button>)}
-        
+      </div>
     </Card>
   );
 }

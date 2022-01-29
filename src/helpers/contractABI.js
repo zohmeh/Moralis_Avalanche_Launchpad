@@ -91,6 +91,19 @@ export const MagePadNFTABI = [
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "newNFT",
+    "type": "event"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -425,6 +438,24 @@ export const MagePadNFTABI = [
       },
       {
         "internalType": "address",
+        "name": "_magePadAddress",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawInterest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
         "name": "_magePadNFTAddress",
         "type": "address"
       }
@@ -466,7 +497,7 @@ export const MagePadNFTABI = [
   }
 ];
 
-export const MagePadNFTAddress = "0x43E2707c28ae630ff88063f8DB1C1f8898a2F96F".toLowerCase();
+export const MagePadNFTAddress = "0xcaB15ed769F5E200Ef303AeE075D968Ef453e11e".toLowerCase();
 
 export const MarketplaceABI = [
   {
@@ -575,6 +606,18 @@ export const MarketplaceABI = [
         "indexed": false,
         "internalType": "address",
         "name": "magePadNFTAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_to",
         "type": "address"
       }
     ],
@@ -793,7 +836,7 @@ export const MarketplaceABI = [
   }
 ];
 
-export const MarketplaceAddress = "0xaE5bc85CA214950c30f52E9C80de6B37A9C5FC64";
+export const MarketplaceAddress = "0x8c124762ACE5E237e23655592D3E387f996Ba5d3";
 
 export const IERC20ABI = [
   {
@@ -1275,4 +1318,4 @@ export const MagePadABI = [
   }
 ];
 
-export const MagePadAddress = "0xc0aCFaE68C832FBA94520E393A710c17C1DcfD93";
+export const MagePadAddress = "0x189ead78D37DC097de5078Ae3ab3963360fe3fCA";

@@ -1,5 +1,5 @@
-import React from "react";
-import { useMoralis, useMoralisCloudFunction } from "react-moralis";
+import React, { useEffect, useState } from "react";
+import { useMoralis, useMoralisQuery } from "react-moralis";
 import { Skeleton } from "antd";
 import { Moralis } from "moralis";
 import { MagePadNFTAddress, MarketplaceAddress, MagePadABI, MagePadAddress } from "../../helpers/contractABI";
@@ -27,29 +27,59 @@ const styles = {
 
 function NFTBalances() {
   const { account } = useMoralis();
-  const { data } = useMoralisCloudFunction(
-    "getMyMageNFTs",
-    { MagePadNFTAddress, account, MarketplaceAddress, MagePadABI, MagePadAddress },
+  const [dataNFT, setDataNFT] = useState();
+  const [dataOffer, setDataOffer] = useState();
+  const { data } = useMoralisQuery(
+    "NewSale",
+    query => query.descending("objetcId"),
     [],
     { live: true }
   );
 
-  return (
-    <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "space-between", width: "100%"}}>
-      <div style={styles.NFTs}>
-        <Skeleton loading={!data}>
-          {data &&
-            data.result.map((nft, index) => {
-                return (
-                  <NFTBalance nft={nft} index={index} key={nft.token_id} />
-                );
-              }
-            )}
-        </Skeleton>
+  async function fetchData () {
+    const params =  { 
+      account: account,
+      MagePadNFTAddress: MagePadNFTAddress,
+    };
+    const nftData = await Moralis.Cloud.run("getMyMageNFTs", params);
+    setDataNFT(nftData);
+  
+    const paramsOffer =  { 
+      account: account,
+      MagePadNFTAddress: MagePadNFTAddress,
+      MarketplaceAddress: MarketplaceAddress,
+    };
+    const offerData = await Moralis.Cloud.run("getMyOffers", paramsOffer);
+    setDataOffer(offerData);
+  }
+
+  useEffect(() => {
+    account && fetchData();
+  }, [account, data])
+
+  if(dataOffer && dataNFT) {
+    return (
+      <div style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "space-between", width: "100%"}}>
+        <div style={styles.NFTs}>
+          <Skeleton loading={!dataNFT}>
+            {dataNFT &&
+              dataNFT.result.map((nft, index) => {
+                  return (
+                    <NFTBalance nft={nft} index={index} key={nft.token_id} />
+                  );
+                }
+              )}
+          </Skeleton>
+        </div>
+        <MyOffers offers={dataOffer}/>
       </div>
-      <MyOffers />
-    </div>
-  );
+    );
+  } else {
+    return (<div></div>)
+  }
+
+
+  
 }
 
 export default NFTBalances;

@@ -104,6 +104,21 @@ function NFTBalance({ nft, index }) {
     setIsStateLoading(false);
   }
 
+  async function withdrawInterest() {
+    setIsStateLoading(true);
+    const optionsWithdrawInterest = {
+      contractAddress: MagePadNFTAddress,
+      functionName: "withdrawInterest",
+      abi: MagePadNFTABI,
+      params: {
+        _tokenId: tokenId,
+        _magePadAddress: MagePadAddress
+      }
+    };
+    await Moralis.executeFunction(optionsWithdrawInterest);
+    setIsStateLoading(false);
+  }
+
   async function removeOffer() {
     setIsStateLoading(true);
     const options = {
@@ -135,6 +150,16 @@ function NFTBalance({ nft, index }) {
       MarketplaceAddress: MarketplaceAddress,
   }
   await Moralis.Cloud.run("acceptFinalOffer", params);
+
+  //set offerAccepted to true so that nobody can make a new offer
+  const query = new Moralis.Query("NewSale");
+  query.equalTo("magePadNFTAddress", MagePadNFTAddress);
+  query.equalTo("tokenId", tokenId);
+  let result = await query.first();
+
+  result.set("offerAccepted", true);
+  await result.save();
+
   setIsStateLoading(false);
   }
 
@@ -180,7 +205,8 @@ function NFTBalance({ nft, index }) {
       (nftInfo.marketInfo.isActive === false ?
         <div style={{display: "flex", justifyContent: "center", flexDirection: "column", gap: "10px"}}>
           < Button onClick={putOnSale} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Put on Sale</Button>
-          < Button onClick={withdraw} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Withdraw tokens inside NFT</Button>
+          < Button onClick={withdraw} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Withdraw all tokens </Button>
+          < Button onClick={withdrawInterest} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Withdraw only interest </Button>
         </div>
          :
          nftInfo.marketInfo.isActive === true && !nftInfo.marketInfo.offerAccepted ?  

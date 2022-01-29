@@ -1,8 +1,6 @@
 import React from "react";
-import { useMoralis, useMoralisCloudFunction } from "react-moralis";
 import { Skeleton } from "antd";
 import { Moralis } from "moralis";
-import { MagePadNFTAddress, MarketplaceAddress } from "../../helpers/contractABI";
 import MyOffer from "./MyOffer";
 
 Moralis.start({
@@ -10,15 +8,8 @@ Moralis.start({
   appId: process.env.REACT_APP_MORALIS_APPLICATION_ID,
 });
 
-function MyOffers() {
-  const { account } = useMoralis();
-  const { data } = useMoralisCloudFunction(
-    "getMyOffers",
-    { MagePadNFTAddress, account, MarketplaceAddress },
-    [],
-    { live: true }
-  );
-
+function MyOffers({offers}) {
+  
   const styles = {
     NFTs: {
       display: "flex",
@@ -36,9 +27,9 @@ function MyOffers() {
  
   return (
     <div style={styles.NFTs}>
-        <Skeleton loading={!data}>
-          {data &&
-            data.map((nft, index) => {
+        <Skeleton loading={!offers}>
+          {offers &&
+            offers.map((nft, index) => {
                 return (
                   <MyOffer nft={nft} index={index} key={index} />
                 );

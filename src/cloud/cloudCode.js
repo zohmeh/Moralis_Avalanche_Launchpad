@@ -90,11 +90,11 @@ Moralis.Cloud.define("clearAfterBuy", async (request) => {
   //deleting the investment
   const web3 = Moralis.web3ByChain("0xa869");
   const contractNFT = new web3.eth.Contract(MagePadNFTABI, request.params.MagePadNFTAddress);
-  const owner = await contractNFT.methods.ownerOf(request.params.tokenId).call();
   const nftInfo = await contractNFT.methods.allNFTs(request.params.tokenId).call();
   const query2 = new Moralis.Query("NewInvestments");
-  query2.equalTo("investorAddress", owner.toLowerCase());
-  query2.equalTo("tokenAddress", nftInfo.tokenAddress);
+    
+  query2.equalTo("investorAddress", request.params.seller.toLowerCase());
+  query2.equalTo("tokenAddress", nftInfo.tokenAddress.toLowerCase());
   let result2 = await query2.first();
   if(result2) {
     await result2.destroy();
@@ -113,8 +113,8 @@ Moralis.Cloud.define("storePricehistory", async (request) => {
       price: request.params.price,
     }
     let oldEntries = result.get("pricehistory");
-    let newEntries = oldEntries.push(newEntry);
-    result.set("pricehistory", newEntries);
+    oldEntries.push(newEntry)
+    result.set("pricehistory", oldEntries);
     await result.save();
   }
   //if there is no result, a new entry or this nft has to be created
@@ -148,7 +148,7 @@ Moralis.Cloud.define("getPricehistory", async (request) => {
     const dateObject = new Date(pricehistory[i].date);
     const point = {
       date: dateObject.toLocaleString("en-US"),
-      price: (parseInt(pricehistory[i].price) / 1000000000000000000).toString(),
+      price: (parseInt(pricehistory[i].price) / 1000000000000000000),
     }
     plotData.push(point);
   }
@@ -182,8 +182,8 @@ Moralis.Cloud.define("placeOffer", async (request) => {
 });
 
 Moralis.Cloud.job("checkMarketplace", async (request) => {
-  const MarketplaceAddress = "0x53b8A0c41b41D5FF5906Fc16f8784713a6E14638";
-  const MagePadNFTAddress = "0x0b510918b07227048594B9416253c1601f9ECb2d";
+  const MarketplaceAddress = "0x8c124762ACE5E237e23655592D3E387f996Ba5d3";
+  const MagePadNFTAddress = "0xcaB15ed769F5E200Ef303AeE075D968Ef453e11e";
 
   const web3 = Moralis.web3ByChain("0xa869");
   const contractMarketplace = new web3.eth.Contract(MarketplaceABI, MarketplaceAddress);
@@ -392,6 +392,19 @@ const MagePadNFTABI = [
       }
     ],
     "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
+    ],
+    "name": "newNFT",
     "type": "event"
   },
   {
@@ -729,6 +742,24 @@ const MagePadNFTABI = [
       },
       {
         "internalType": "address",
+        "name": "_magePadAddress",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawInterest",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_tokenId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
         "name": "_magePadNFTAddress",
         "type": "address"
       }
@@ -877,6 +908,18 @@ const MarketplaceABI = [
         "indexed": false,
         "internalType": "address",
         "name": "magePadNFTAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_from",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_to",
         "type": "address"
       }
     ],

@@ -20,6 +20,7 @@ function NFTForSale({ nft, index }) {
   const [showDiagramm, setShowDiagramm] = useState(false);
   const [isStateLoading, setIsStateLoading] = useState(false);
   const [nftInfo, setNFTInfo] = useState();
+
   const { data } = useMoralisCloudFunction(
     "getPricehistory",
     { MagePadNFTAddress, tokenId },
@@ -117,18 +118,19 @@ function NFTForSale({ nft, index }) {
       }
       //key={nft.id}
     >
-      <h3 style={{ color: "orange" }}>{"Hourglass NFT "+ " " + nftInfo.tokenId} </h3>
+      <h3 style={{ color: "orange" }}>{"Hourglass NFT "+ " " + tokenId} </h3>
       <p>{"Locked Token: " + nftInfo.tokenName}</p>
       <p>{"Locked Amount: " + tokenValue(nftInfo.lockedAmount, nftInfo.tokenDecimals).toFixed(6)}</p>
       <p>{"Earned staking reward: " + tokenValue(stakingReward, nftInfo.tokenDecimals).toFixed(6)}</p>
       <p>Actual highest bidder: {getEllipsisTxt(nftInfo.marketInfo.bidder)} </p>
       <p>Actual highest bid: {tokenValue(nftInfo.marketInfo.price, 18).toFixed(6) + " AVAX"} </p>
-      {isStateLoading ? <div style={{display: "flex", justifyContent: "center"}}><Spin/></div> :
+      {!nft.attributes.offerAccepted &&
+      (isStateLoading ? <div style={{display: "flex", justifyContent: "center"}}><Spin/></div> :
       <div style={{display: "flex", justifyContent: "center"}}>
       <InputNumber style={{width: "180px"}} min="0" step="0.000000000000000001"onChange={(event) => setAmount(event)}/>    
       < Button onClick={makeOffer} style={{color: "orange", backgroundColor: "blue", borderRadius: "15px", border: "0px"}}>Make Offer</Button>
     </div>
-    }     
+      )}     
     </Card>
   );}
   else {

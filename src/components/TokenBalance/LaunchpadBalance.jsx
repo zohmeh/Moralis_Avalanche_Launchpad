@@ -27,7 +27,6 @@ function LaunchpadBalance() {
         investments[i].lockedTokens = lockedTokens;
        }
      }
-     console.log(investments);
      setMyInvestments(investments);
   };
 
