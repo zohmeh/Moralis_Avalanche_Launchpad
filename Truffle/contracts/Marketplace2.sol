@@ -26,7 +26,7 @@ contract Marketplace2 {
     address operator;
     event NewSale(uint256 tokenId, address magePadNFTAddress);
     event RemoveSale(uint256 tokenId, address magePadNFTAddress);
-    event SoldNFT(uint256 tokenId, address magePadNFTAddress);
+    event SoldNFT(uint256 tokenId, address magePadNFTAddress, address _from, address _to);
     event NewOffer(uint256 tokenId, uint256 price, address caller);
     event OfferAccepted(uint256 tokenId, address magePadNFTAddress, address caller);
 
@@ -83,6 +83,8 @@ contract Marketplace2 {
         require(msg.value == saleMap[magePadNFTAddress][tokenId].price, "Please send the correct Price for this NFT");
         require(msg.sender == saleMap[magePadNFTAddress][tokenId].bidder, "Not your bid was accepted");
 
+        address seller = MagePadNFT(magePadNFTAddress).ownerOf(tokenId);
+
         delete saleMap[magePadNFTAddress][tokenId];
 
         MagePadNFT(magePadNFTAddress).approve(msg.sender, tokenId);
@@ -90,7 +92,7 @@ contract Marketplace2 {
         MagePadNFT(magePadNFTAddress).safeTransferFrom(originalOwner, msg.sender, tokenId); 
         originalOwner.transfer(msg.value);
 
-        emit SoldNFT(tokenId, magePadNFTAddress);
+        emit SoldNFT(tokenId, magePadNFTAddress, seller, msg.sender);
     }
 
     function makePriceOffer(uint256 tokenId, uint256 price, address caller, address magePadNFTAddress) public {

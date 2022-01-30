@@ -60,7 +60,7 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     fuji: {
-     provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "wss://speedy-nodes-nyc.moralis.io/cff6f789838e10c4008b1baa/avalanche/testnet/ws"),
+     provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "your node"),
      network_id: 43113,       // Ropsten's id
     // gas: 5500000,        // Ropsten has a lower block limit than mainnet
     // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -68,7 +68,7 @@ module.exports = {
     // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
     mumbai: {
-      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "wss://speedy-nodes-nyc.moralis.io/cff6f789838e10c4008b1baa/polygon/mumbai/ws"),
+      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "your node"),
       network_id: 80001,       // Ropsten's id
      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
@@ -76,7 +76,7 @@ module.exports = {
      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
      },
      kovan: {
-      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "wss://speedy-nodes-nyc.moralis.io/cff6f789838e10c4008b1baa/eth/kovan/archive/ws"),
+      provider: () => new HDWalletProvider(process.env.PRIVATE_KEY, "your node"),
       network_id: 42,       // Ropsten's id
      // gas: 5500000,        // Ropsten has a lower block limit than mainnet
      // confirmations: 2,    // # of confs to wait between deployments. (default: 0)

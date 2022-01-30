@@ -102,6 +102,9 @@ const App = ({ isServerInfo }) => {
               <Route path="/">
                 <Redirect to="/balances" />
               </Route>
+              <Route path="*">
+                <Redirect to="/balances" />
+              </Route>
             </Switch>
           ) : (
             <Switch>

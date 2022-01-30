@@ -54,6 +54,13 @@ contract MagePadNFT is ERC721 {
         IMagePad(_magePadAddress).payOutReward(allNFTs[_tokenId].tokenAddress, _stakingPeriod, msg.sender);
     }
 
+    function withdrawInterest(uint256 _tokenId, address _magePadAddress) public {
+        require(msg.sender == ownerOf(_tokenId), "Only owner of the nft can withdraw the interest");
+        uint256 _stakingPeriod = block.timestamp - allNFTs[_tokenId].mintingTime;
+        allNFTs[_tokenId].mintingTime = block.timestamp;
+        IMagePad(_magePadAddress).payOutReward(allNFTs[_tokenId].tokenAddress, _stakingPeriod, msg.sender);
+    }
+
     function putForSale(uint256 _tokenId, /*uint256 _price,*/ address _magePadNFTAddress) public returns(bool) {
       require(msg.sender == ownerOf(_tokenId), "Only owner of the nft can put it for sale");
       

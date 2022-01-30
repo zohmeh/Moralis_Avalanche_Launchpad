@@ -46,14 +46,13 @@ contract MagePad {
 
     function createProject(address _tokenAddress, uint256 _amount, uint256 _projectDuration, uint256 _conversionRate, uint256 _lockedPercentage) public {
         uint256 _projectEndingTime = block.timestamp + _projectDuration;
-        projects[_tokenAddress] = Project((_amount / 2), (_amount / 2), msg.sender, _projectEndingTime, _conversionRate, _lockedPercentage, false, 5000000000000);  
+        projects[_tokenAddress] = Project((_amount / 2), (_amount / 2), msg.sender, _projectEndingTime, _conversionRate, _lockedPercentage, false, 500000000000);  
         IERC20(_tokenAddress).transferFrom(msg.sender, address(this), _amount);       
     }
 
     function invest(address _tokenAddress, uint256 _amount) public payable {
         require(investors[msg.sender][_tokenAddress].investorAddress == address(0), "You already invested in this project");
         require(projects[_tokenAddress].launchingTokenBalance >= _amount, "Not enough balance to send");
-        require(_amount == msg.value * projects[_tokenAddress].conversionRate, "Not enough AVAX to buy this amount of tokens");
         uint256 _lockedAmount = _amount * projects[_tokenAddress].lockedPercentage / 100;
         uint256 _sendingAmount = _amount - _lockedAmount;        
         investors[msg.sender][_tokenAddress] = Investor(msg.sender, _tokenAddress, _lockedAmount);
@@ -70,12 +69,14 @@ contract MagePad {
         require(projects[_tokenAddress].projectOwner == msg.sender, "Only project owner can unlock tokens");
         require(projects[_tokenAddress].allowUnlocking == false, "Tokens already unlocked");
         projects[_tokenAddress].allowUnlocking = true;
+        projects[_tokenAddress].interest = 1000000000000;
 
         //sending all locked tokens to their owners
         for(uint256 i = 0; i < allInvestors.length; i++) {
             uint256 _balance = investors[allInvestors[i]][_tokenAddress].lockedAmount;
+            investors[allInvestors[i]][_tokenAddress].lockedAmount = 0;
             if(_balance > 0) {
-                IERC20(_tokenAddress).transfer(msg.sender, _balance);
+                IERC20(_tokenAddress).transfer(allInvestors[i], _balance);
             }
         }
     }
